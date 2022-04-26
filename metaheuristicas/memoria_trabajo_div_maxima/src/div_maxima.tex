@@ -70,7 +70,7 @@ Una vez definidos estos elementos comunes, vamos a pasar a las formas de resolve
 
 Para resolver el problema usando una heurística no es necesario definir más elementos concretos, con los elementos comunes es suficiente.
 
-La heurística que he pensado se basa en simplemente ir buscando en la matriz de distancias la pareja $i, j$ con mayor distancia. Si nos quedan más de dos nodos por seleccionar, me es indiferente si uno de ellos se ha seleccionado antes o no siempre que sea la mayor distancia de la matriz, mientras que si queda solo un nodo por seleccionar solo escojo una pareja $i, j$ tal que el elemento $j$ ya esté seleccionado, para asegurarme que se escogen exactamente $m$ elementos. Tras actualizar la solución $x$, hago que la distancia $d_{ij} = 0$ para que no vuelva a escoger esa pareja, y vuelvo a repetir el proceso hasta escoger $m$ nodos.
+La heurística que he pensado se basa en simplemente ir buscando en la matriz de distancias la pareja $i, j$ con mayor distancia. Si nos quedan más de dos elementos por seleccionar, me es indiferente si uno de ellos se ha seleccionado antes o no siempre que sea la mayor distancia de la matriz, mientras que si queda solo un nodo por seleccionar solo escojo una pareja $i, j$ tal que el elemento $j$ ya esté seleccionado, para asegurarme que se escogen exactamente $m$ elementos. Tras actualizar la solución $x$, hago que la distancia $d_{ij} = 0$ para que no vuelva a escoger esa pareja, y vuelvo a repetir el proceso hasta escoger $m$ elementos.
 
 \begin{lstlisting}[language=python]
 Heuristica Ad-hoc(n, m, d):
@@ -102,4 +102,55 @@ Heuristica Ad-hoc(n, m, d):
 
 \section{Búsqueda local}
 
+En el caso de resolver el problema utilizando una búsqueda local si es necesario definir un nuevo elemento, el operador de vecindario. Este operador será el que, a partir de una solución $x$ al problema, genere una nueva solución $x'$ dentro del vecindario de la solución $x$, es decir, una solución $x'$ parecida a $x$ pero con un cambio que se definirá en el operador de vecindario.
+
+También es importante recordar que la búsqueda local trabaja mejorando soluciones ya construidas, por lo que se utilizará como solución de partida la solución generada por la heurística ad-hoc descrita en el apartado anterior.
+
 \subsection{Operador de vecindario}
+
+El operador de vecindario que he decidido utilizar es un operador de vecino bastante simple para la representación del problema que estamos utilizando. Este operador escogerá un elemento $i$ de la solución tal que $x[i] = 1$, es decir, esté seleccionado, y otro elemento $j$ de la solución tal que $x[j] = 0$, y simplemente se dejará de seleccionar el elemento $i$ y se pasará a seleccionar $j$, y esa nueva solución será el vecino generado. El operador de vecino también tendrá en cuenta los vecinos ya generados, para no repetirlos
+
+
+\begin{lstlisting}[language=python]
+Operador_vecino(x, parejas_generadas):
+	vecino <- x
+	i <- numero entre 0 y la longitud de x tal que x[i] = 1
+	j <- numero entre 0 y la longitud de x tal que x[j] = 0
+
+	Mientras la pareja i,j esté en parejas_generadas:
+		i <- numero entre 0 y la longitud de x tal que x[i] = 1
+		j <- numero entre 0 y la longitud de x tal que x[j] = 0
+
+	vecino[i] <- 0
+	vecino[j] <- 1
+
+	parejas_generadas <- insertar la pareja i,j y la pareja j, i
+
+	Devolver la solucion vecino y parejas_generadas
+\end{lstlisting}
+
+\newpage
+
+\subsection{Algoritmo de búsqueda local}
+
+
+Una vez tenemos el operador de vecino, la búsqueda local tendría la siguiente forma:
+
+\begin{lstlisting}[language=python]
+Busqueda local(n, m, d):
+	x <- Heuristica Ad-hoc(n, m, d)
+	hay_mejora <- 1
+
+	Mientras hay_mejora = 1:
+		parejas_generadas <- conjunto vacio
+		hay_mejora <- 0
+
+		Mientras queden parejas sin generar en parejas_generadas y hay_mejora = 0:
+			vecino, parejas_generadas <- Operador_vecino(x, parejas_generadas)
+			Si MD(vecino) > MD(x):
+				hay_mejora <- 1
+				x <- vecino
+	Devolver la solucion x
+\end{lstlisting}
+
+Como vemos, esta búsqueda parte de la solución inicial de la heurística ad-hoc, y simplemente cada vez que encuentra una nueva solución mejor, parte de esa nueva solución, comienza a generar vecinos hasta encontrar otra solución mejor y volver a comenzar de nuevo con esa nueva solución. En el caso de que genere todos los vecinos posibles y no encuentre una mejor solución, la búsqueda se detendría y devolvería la mejor solución encontrada hasta el momento.
