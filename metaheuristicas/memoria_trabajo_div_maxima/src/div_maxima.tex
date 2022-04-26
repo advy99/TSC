@@ -28,10 +28,49 @@ De cara a resolver este problema se van a proponer dos métodos, una heurística
 
 \newpage
 
+\section{Elementos necesarios para resolver el problema}
+
+De cara a poder resolver el problema primero tenemos que plantear distintos elementos sobre como vamos a tratar el problema para poder buscar las soluciones de este y escoger una de ellas. Aunque la mayoría de estos elementos nos los proporciona el enunciado, vamos a formalizarlos.
+
+\subsection{Representación del problema}
+
+La representación viene dada en el enunciado. Una solución a nuestro problema será un vector binario de tamaño $n$, donde $x_i = 1$ significa que hemos seleccionado el elemento $i$ del conjunto $N$ para que forme parte de $M$.
+
+\[
+x = (x_1, \dots, x_n) / x_i = \{0, 1\}, i = 1, \dots, n
+\]
+
+\subsection{Restricciones del problema}
+
+En este caso el problema solo tiene una restricción:
+
+
+\[
+\displaystyle\sum_{i=1}^{n} x_i = m
+\]
+\[
+x_i = \{0,1\}, i = 1, \dots, n
+\]
+
+Es decir, que no podemos seleccionar más de $m$ elementos.
+
+\subsection{Función objetivo}
+
+La función objetivo se trata de la función $MD(X)$, comentada en la descripción del problema al inicio de este documento.
+
+\subsection{Criterio de comparación entre soluciones}
+
+En este caso el criterio de comparación entre dos soluciones será el máximo del valor de su función objetivo, ya que estamos intentando maximizar el valor de la diversidad.
+
+Una vez definidos estos elementos comunes, vamos a pasar a las formas de resolver el problema.
+
+\newpage
 
 \section{Heuristica ad-hoc}
 
-La heurística que he pensado se basa en simplemente ir buscando en la matriz de distancias la pareja $i, j$ con mayor distancia. Si nos quedan más de dos nodos por seleccionar, me es indiferente si uno de ellos se ha seleccionado antes o no, mientras sea la mayor distancia de la matriz, mientras que si queda solo un nodo por seleccionar solo escojo una pareja $i, j$ tal que el elemento $j$ ya esté seleccionado, para asegurarme que se escogen exactamente $m$ elementos. Tras actualizar la solución $x$, hago que la distancia $d_{ij} = 0$ para que no vuelva a escoger esa pareja, y vuelvo a repetir el proceso hasta escoger $m$ nodos.
+Para resolver el problema usando una heurística no es necesario definir más elementos concretos, con los elementos comunes es suficiente.
+
+La heurística que he pensado se basa en simplemente ir buscando en la matriz de distancias la pareja $i, j$ con mayor distancia. Si nos quedan más de dos nodos por seleccionar, me es indiferente si uno de ellos se ha seleccionado antes o no siempre que sea la mayor distancia de la matriz, mientras que si queda solo un nodo por seleccionar solo escojo una pareja $i, j$ tal que el elemento $j$ ya esté seleccionado, para asegurarme que se escogen exactamente $m$ elementos. Tras actualizar la solución $x$, hago que la distancia $d_{ij} = 0$ para que no vuelva a escoger esa pareja, y vuelvo a repetir el proceso hasta escoger $m$ nodos.
 
 \begin{lstlisting}[language=python]
 Heuristica Ad-hoc(n, m, d):
@@ -58,6 +97,8 @@ Heuristica Ad-hoc(n, m, d):
 			d[i, j] <- 0
 	Devolver x como la solución
 \end{lstlisting}
+
+\newpage
 
 \section{Búsqueda local}
 
