@@ -1,6 +1,63 @@
-\section{Descripción del problema}
+\section{Descripción del problema de la diversidad máxima}
+
+Este problema se basa en, dado un conjunto inicial $N$ con $n$ elementos, escoger un subconjunto $M$ con $m$ de estos elementos tal que $n > m$ de forma que se maximice la diversidad entre los elementos escogidos.
+
+Este problema se puede formular como maximizar la siguiente función:
+
+\[
+MD(X) = \displaystyle\sum_{i=1}^{n - 1} \displaystyle\sum_{j=1}^{n} d_{ij} x_i x_j
+\]
+
+Sujeto a:
+
+\[
+\displaystyle\sum_{i=1}^{n} x_i = m
+\]
+\[
+x_i = \{0,1\}, i = 1, \dots, n
+\]
+
+Donde:
+
+\begin{itemize}
+	\item $x = (x_1, \dots, x_n)$ es la representación de una solución al problema, que consiste en un vector binario donde $x_i = 1$ indica que el elemento $i$ ha sido seleccionado.
+	\item $d_{ij}$ es la distancia existente entre los elementos $i$ y $j$. Estas distancias son parámetros del problema.
+\end{itemize}
+
+De cara a resolver este problema se van a proponer dos métodos, una heurística ad-hoc, específica para resolver este problema, y una búsqueda local.
+
+\newpage
+
 
 \section{Heuristica ad-hoc}
+
+La heurística que he pensado se basa en simplemente ir buscando en la matriz de distancias la pareja $i, j$ con mayor distancia. Si nos quedan más de dos nodos por seleccionar, me es indiferente si uno de ellos se ha seleccionado antes o no, mientras sea la mayor distancia de la matriz, mientras que si queda solo un nodo por seleccionar solo escojo una pareja $i, j$ tal que el elemento $j$ ya esté seleccionado, para asegurarme que se escogen exactamente $m$ elementos. Tras actualizar la solución $x$, hago que la distancia $d_{ij} = 0$ para que no vuelva a escoger esa pareja, y vuelvo a repetir el proceso hasta escoger $m$ nodos.
+
+\begin{lstlisting}[language=python]
+Heuristica Ad-hoc(n, m, d):
+	x <- Secuencia de n ceros
+	numero_seleccionados <- 0
+
+	Mientras numero_seleccionados < m:
+		Si m - numero_seleccionados > 2:
+			i, j <- buscar en d la posición i, j con mayor valor
+			Si x[i] = 0 y x[j] = 0:
+				x[i] <- 1
+				x[j] <- 1
+				numero_seleccionados <- numero_seleccionados + 2
+			Si x[i] = 1:
+				x[j] <- 1
+				numero_seleccionados <- numero_seleccionados + 1
+			Si x[j] = 1:
+				x[i] <- 1
+				numero_seleccionados <- numero_seleccionados + 1
+			d[i, j] <- 0
+		Si no:
+			i, j <- buscar en d la posición i, j con mayor valor, sujeto a que x[j] = 1
+			x[i] <- 1
+			d[i, j] <- 0
+	Devolver x como la solución
+\end{lstlisting}
 
 \section{Búsqueda local}
 
