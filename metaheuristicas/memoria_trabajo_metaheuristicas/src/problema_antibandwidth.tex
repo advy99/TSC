@@ -26,20 +26,63 @@ Como nos comentaba el enunciado, estas soluciones deberán maximizar la función
 
 \subsection{Propuesta greedy}
 
-\begin{lstlisting}
+De cara a resolver el problema utilizando un enfoque greedy, lo que haremos será comenzar con una solución con todos los nodos etiquetados a cero, y con esto, iterar sobre cada nodo, asignando la etiqueta que maximice la función objetivo $AB(f,G)$.
 
+\begin{lstlisting}
+Greedy AB (G):
+	solucion <- vector de longitud |G|, inicializado a cero
+
+	Para cada elemento x de G:
+		solucion[x] <- etiqueta que maximice AB(solucion, G)
+
+	Devolver solucion
 \end{lstlisting}
 
 \subsection{Propuesta semi-greedy}
 
 \begin{lstlisting}
+Semi-Greedy AB (G):
+	solucion <- vector de longitud |G|, inicializado a cero
 
+	Para cada elemento x de G:
+		candidatos <- lista de etiquetas ordenadas segun maximice AB(solucion, G)
+
+		etiqueta <- escoger un elemento de candidatos usando una ruleta (mayor probabilidad a los candidatos que mas maximicen AB)
+
+		solucion[x] <- etiqueta
+
+	Devolver solucion
 \end{lstlisting}
 
 \subsection{Propuesta iterated greedy}
 
 \begin{lstlisting}
+DestruirSolucion(solucion, porcentajeDestruccion):
 
+	Para cada elemento x de solucion:
+		Si aleatorio < porcentajeDestruccion:
+			solucion[x] <- 0
+
+	Devolver solucion
+
+
+ConstruirSolucion(destruida, G):
+	Para cada elemento x de solucion, tal que solucion[x] = 0:
+		solucion[x] <- etiqueta que maximice AB(solucion, G)
+
+	Devolver solucion
+
+Iterated-Greedy AB (G, iteraciones, porcentajeDestruccion):
+	solucion <- Greedy(G)
+
+	Repetir iteraciones veces:
+		destruida <- DestruirSolucion(solucion, porcentajeDestruccion)
+		reconstruida <- ConstruirSolucion(destruida, G)
+
+		Si AB(reconstruida, G) > AB(solucion, G):
+			solucion <- reconstruida
+
+	Devolver solucion
 \end{lstlisting}
 
 \subsection{Propuesta búsqueda local}
