@@ -2,11 +2,45 @@
 
 \subsection{Revisión bibliográfica usando SCOPUS}
 
+Para comenzar vamos a realizar una breve revisión bibliográfica del problema utilizando la herramienta SCOPUS.
+
+De cara a buscar los trabajos más relevantes para este problema he utilizado el buscador de SCOPUS, ordenando los resultados por número de citas.
+
+Echando un vistazo rápido podemos ver que de cara a resolver este problema se han realizado pruebas con GRASP, algoritmos meméticos, algoritmos de colonias de abejas, búsqueda tabú, híbridos entre estos algoritmos, entre otras técnicas.
+
+
+El trabajo más relevante en el área de la computación es GRASP with Path Relinking Heuristics for the
+Antibandwidth Problem \cite{antibandwidthGRASP}. En este trabajo se propone una forma de resolver el problema usando un modelo de programación entera, así como utilizando GRASP y re-enlazado de caminos. Estas pruebas dieron muy buenos resultados en los distintos grafos utilizados en la experimentación.
+
+Otro trabajo bastante citado es A hybrid metaheuristic for the cyclic antibandwidth problem \cite{hybridMetaheuristicAntibandwith}. Esta propuesta se basa en un algoritmo híbrido entre un algoritmo de colonias de abejas y una búsqueda tabú. Además de explicar todos los detalles del problema, componentes principales del algoritmo que proponen, así como un pseudocódigo de la implementación, realizan diversos experimentos para comprobar el funcionamiento de dicha propuesta, demostrando que es viable y consigue resolver el problema de una forma bastante eficiente, tanto a nivel de calidad de la solución como de como se recorre el espacio de búsqueda del problema.
+
+Además de estas propuestas, otra que destaca es A memetic algorithm for the cyclic antibandwidth maximization problem \cite{memeticoAntibandwith}. Aquí se propone un algoritmo memético, un híbrido entre un algoritmo genético y una búsqueda local, de cara a resolver el problema. Esta propuesta comenta las mejoras que puede conllevar mezclar la exploración de los algoritmos genéticos con la alta explotación de la búsqueda local para encontrar buenas soluciones. Con respecto a los resultados obtenidos, en este estudio se realizan diversas pruebas con grafos en los que es conocida la solución optima, donde la propuesta consigue unos resultados muy buenos.
+
+Como vemos, para este problema todas las propuestas de mayor interés en la literatura se han centrado en resolver el problema utilizando metaheurísticas, principalmente debido a la complejidad del problema.
+
+\subsection{Representación de una solución}
+
+De cara a representar una solución se utilizará un vector con un tamaño igual al número de nodos del grafo, donde cada posición representará un nodo, y el valor en dicha posición la etiqueta asignada a dicho nodo.
+
+Como nos comentaba el enunciado, estas soluciones deberán maximizar la función $AB(f, G)$, siendo $f$ un etiquetado del grafo $G$.
+
 \subsection{Propuesta greedy}
+
+\begin{lstlisting}
+
+\end{lstlisting}
 
 \subsection{Propuesta semi-greedy}
 
+\begin{lstlisting}
+
+\end{lstlisting}
+
 \subsection{Propuesta iterated greedy}
+
+\begin{lstlisting}
+
+\end{lstlisting}
 
 \subsection{Propuesta búsqueda local}
 
