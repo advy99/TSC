@@ -33,19 +33,21 @@ Greedy AB (G):
 	solucion <- vector de longitud |G|, inicializado a cero
 
 	Para cada elemento x de G:
-		solucion[x] <- etiqueta que maximice AB(solucion, G)
+		solucion[x] <- etiqueta que maximice AB(solucion, G), y etiqueta no está en solucion
 
 	Devolver solucion
 \end{lstlisting}
 
 \subsection{Propuesta semi-greedy}
 
+De cara a la propuesta semi-greedy, utilizaremos un enfoque similar a la propuesta greedy, pero en lugar de escoger la etiqueta que maximice la función objetivo para cierto nodo, haremos una ruleta con todas las etiquetas, asignando una mayor probabilidad a las etiquetas que más maximicen la función objetivo para dicho nodo.
+
 \begin{lstlisting}
 Semi-Greedy AB (G):
 	solucion <- vector de longitud |G|, inicializado a cero
 
 	Para cada elemento x de G:
-		candidatos <- lista de etiquetas ordenadas segun maximice AB(solucion, G)
+		candidatos <- lista de etiquetas ordenadas segun maximice AB(solucion, G) y que no esté en solucion
 
 		etiqueta <- escoger un elemento de candidatos usando una ruleta (mayor probabilidad a los candidatos que mas maximicen AB)
 
@@ -55,6 +57,10 @@ Semi-Greedy AB (G):
 \end{lstlisting}
 
 \subsection{Propuesta iterated greedy}
+
+Para la propuesta iterated greedy, lo que haremos será partir de la solución greedy generada, como hemos visto en clase, destruir parcialmente dicha solución, y reconstruirla, de forma que si es mejor que la solución que teníamos nos la quedamos.
+
+De cara a destruir parcialmente una solución lo que haremos será usar un porcentaje para indicar en que cantidad queremos destruir dicha solución, etiquetando a cero de forma aleatoria dicho porcentaje de nodos. Para reconstruir la solución simplemente tomaremos el mismo enfoque que el enfoque greedy, pero esta vez solo con los nodos que están etiquetados a cero (hemos destruido su solución).
 
 \begin{lstlisting}
 DestruirSolucion(solucion, porcentajeDestruccion):
@@ -68,12 +74,12 @@ DestruirSolucion(solucion, porcentajeDestruccion):
 
 ConstruirSolucion(destruida, G):
 	Para cada elemento x de solucion, tal que solucion[x] = 0:
-		solucion[x] <- etiqueta que maximice AB(solucion, G)
+		solucion[x] <- etiqueta que maximice AB(solucion, G) que no esté en solucion
 
 	Devolver solucion
 
 Iterated-Greedy AB (G, iteraciones, porcentajeDestruccion):
-	solucion <- Greedy(G)
+	solucion <- Greedy AB(G)
 
 	Repetir iteraciones veces:
 		destruida <- DestruirSolucion(solucion, porcentajeDestruccion)
@@ -85,13 +91,54 @@ Iterated-Greedy AB (G, iteraciones, porcentajeDestruccion):
 	Devolver solucion
 \end{lstlisting}
 
+Como vemos, con estos algoritmos tenemos una forma rápida de obtener una solución al problema, aunque las soluciones no sean de una calidad muy buena. Aun así, en todos los casos las propuestas tienen un orden de complejidad $O(n)$, a excepción de iterated greedy, que sería $O(n^2)$ en el caso de que el porcentaje de destrucción sea del 100\%, pero en ese caso en realidad estaríamos ante un algoritmo greedy con reinicialización, en el que lanzamos muchas veces el algoritmo greedy y nos quedamos con la mejor solución, nunca mantenemos información entre una solución y otra.
+
 \subsection{Propuesta búsqueda local}
+
+De cara a proponer un algoritmo de búsqueda local primero tenemos que proponer el operador de vecindario que vamos a utilizar.
 
 \subsubsection{Operador de vecino}
 
+Para este problema el operador de vecino es muy simple, tan solo intercambiamos las etiquetas asignadas entre dos nodos seleccionados de forma aleatoria, teniendo en cuenta también que antes no se haya generado dicho cambio, para evitar que al generar vecinos de forma aleatoria se generen varias veces los mismos vecinos.
+
+\begin{lstlisting}[language=python]
+Operador_vecino(solucion, parejas_generadas):
+	vecino <- solucion
+	i <- numero entre 0 y la longitud de solucion
+	j <- numero entre 0 y la longitud de solucion
+
+	Mientras la pareja i,j esté en parejas_generadas Y i = j:
+		i <- numero entre 0 y la longitud de solucion
+		j <- numero entre 0 y la longitud de solucion
+
+	vecino[i] <- solucion[j]
+	vecino[j] <- solucion[i]
+
+	parejas_generadas <- insertar la pareja i,j y la pareja j, i
+
+	Devolver vecino y parejas_generadas
+\end{lstlisting}
+
 \subsubsection{Búsqueda local}
 
+Para el algoritmo de búsqueda local utilizamos el esquema básico de búsqueda local, en el que partimos de una solución ya generada (en este caso he utilizado el greedy básico, pero podríamos utilizar cualquiera de las otras variantes del greedy), y mientras encontremos vecinos mejores, seguimos iterando sobre el algoritmo. En el momento en el que de una solución no encontremos ningún vecino con mejor función objetivo quiere decir que hemos llegado a un máximo local, y por lo tanto hemos finalizado con la búsqueda.
 
+\begin{lstlisting}[language=python]
+Busqueda local(G):
+	solucion <- Greedy AB(G)
+	hay_mejora <- 1
+
+	Mientras hay_mejora = 1:
+		parejas_generadas <- conjunto vacio
+		hay_mejora <- 0
+
+		Mientras queden parejas sin generar en parejas_generadas y hay_mejora = 0:
+			vecino, parejas_generadas <- Operador_vecino(solucion, parejas_generadas)
+			Si AB(vecino, G) > AB(solucion, G):
+				hay_mejora <- 1
+				solucion <- vecino
+	Devolver solucion
+\end{lstlisting}
 
 \subsection{Propuesta algoritmo genético}
 
