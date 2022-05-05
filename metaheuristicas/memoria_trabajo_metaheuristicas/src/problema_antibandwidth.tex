@@ -142,10 +142,76 @@ Busqueda local(G):
 
 \subsection{Propuesta algoritmo genético}
 
+De cara a proponer un algoritmo genético debemos primero establecer la representación de las soluciones (cromosomas), el operador de cruce y el operador de mutación a utilizar.
+
 \subsubsection{Representación de los cromosomas}
+
+Con respecto a la representación de las soluciones, se utilizará la misma que en los algoritmos propuestos anteriormente, principalmente porque es una representación en forma de permutación, similar a la utilizada en el problema del viajante de comercio u otros problemas clásicos, en la que sabemos que ciertos operadores de cruce y mutación se comportan muy bien y pueden dar buenos resultados.
 
 \subsubsection{Operador de cruce}
 
+Para el operador de cruce se utilizará un operador de segmento fijo, en el que para generar un hijo escogeremos un segmento de un padre, dicho segmento pasará a formar parte del hijo, y los huecos que queden por rellenar los etiquetaremos con la solución de la madre, de forma similar al operador de cruce visto en clase para el TSP.
+
+\begin{lstlisting}[language=python]
+Generar hijo(padre, madre, longitud):
+	hijo <- vector de 0
+
+	inicio_segmento <- entero aleatorio entre 0 y longitud padre
+	fin_segmento <- inicio_segmento + longitud_segmento
+
+	Con i desde inicio_segmento hasta fin_segmento:
+		hijo[i] <- padre[i mod longitud(padre)]
+
+	Para cada elemento x de hijo con hijo[x] = 0:
+		Si madre[x] no está en hijo:
+			hijo[x] <- madre[x]
+		Si no:
+			hijo[x] <- siguiente elemento de madre a partir de x que no esté en hijo
+
+	Devolver hijo
+
+Operador cruce(padre, madre, longitud_segmento):
+	hijo1 <- Generar hijo(padre, madre, longitud_segmento)
+	hijo2 <- Generar hijo(madre, padre, longitud_segmento)
+
+	Devolver hijo1, hijo2
+\end{lstlisting}
+
+Con esto tenemos una forma de generar hijos manteniendo información de ambos padres, pero de una forma adaptada para el problema.
+
 \subsubsection{Operador de mutación}
 
+Para el operador de mutación simplemente utilizaremos el operador de vecindario propuesto para la búsqueda loca, dada una solución, escoger dos nodos del grafo e intercambiar sus etiquetas, aunque en esta ocasión sin tener en cuenta si se ha generado esta solución antes o no:
+
+
+\begin{lstlisting}
+Operador_mutacion(solucion):
+	mutado <- solucion
+	i <- numero entre 0 y la longitud de solucion
+	j <- numero entre 0 y la longitud de solucion
+
+	Mientras la pareja i,j esté en parejas_generadas Y i = j:
+		i <- numero entre 0 y la longitud de solucion
+		j <- numero entre 0 y la longitud de solucion
+
+	mutado[i] <- solucion[j]
+	mutado[j] <- solucion[i]
+
+	Devolver mutado
+\end{lstlisting}
+
+Con esto ya tenemos todos los operadores básicos para una algoritmo genético, que como hemos visto, el esquema general de dicho algoritmo suele ser siempre el mismo.
+
 \subsubsection{Discusión sobre la inicialización de la población}
+
+Para inicializar la población tenemos distintos métodos que pueden ser viables:
+
+\begin{enumerate}
+	\item Inicializar todos los individuos de forma aleatoria: De esta forma estaríamos fomentando la exploración, haciendo que se comience desde zonas del espacio de búsqueda muy distintas.
+	\item Inicializar los individuos utilizando una búsqueda local: En este caso estaríamos fomentando un poco más la explotación, ya que comenzaríamos desde máximos locales en todos los casos, e intentaríamos mejorar el resultado desde este punto.
+	\item Inicializar los individuos usando la propuesta Greedy: Este sería un caso intermedio, en el que no comenzamos totalmente en puntos aleatorios, pero donde tampoco hemos intentado maximizar la función objetivo desde el punto de partida.
+\end{enumerate}
+
+Conociendo estas formas de inicializar, y sin tener información a priori, otra opción sería combinar estas posibilidades, por ejemplo inicializar parte de la población usando la búsqueda local y otra parte inicializandola de forma aleatoria, para buscar ese equilibrio exploración/explotación.
+
+La mejor opción sería probar el algoritmo de forma empírica (con distintas ejecuciones, al ser algoritmos probabilísticos), de forma que si el algoritmo le cuesta mucho converger y encontrar buenas soluciones, comenzar con la segunda opción, inicializando con la búsqueda local, de cara a orientar la búsqueda, mientras si por el contrario si las soluciones convergen demasiado rápido y se llega a estancar en ciertas soluciones, sería conveniente comenzar de forma aleatoria o usando el greedy.
