@@ -2,26 +2,202 @@
 
 \subsection{Revisión bibliográfica usando SCOPUS}
 
+Al igual que con el problema anterior, voy a comenzar por una breve revisión bibliográfica del problema para conocer las principales propuestas para resolverlo.
+
+
+
 \subsection{Propuesta greedy}
+
+La propuesta greedy es una propuesta muy simple, para cada elemento de $S$ simplemente miramos si la función objetivo consigue un valor más bajo si insertamos el elemento en $S_1$ o en $S_2$, insertándolo finalmente en el conjunto con el que obtengamos menor valor.
+
+\begin{lstlisting}
+Greedy M2NP (S):
+	S1 <- conjunto vacio
+	S2 <- conjunto vacio
+
+	Para cada elemento X de S:
+		S1_prima <- S1 insertando X
+		S2_prima <- S2 insertando X
+
+		Si t(S1_prima, S2) < t(S1, S2_prima):
+			S1 <- S1 insertando X
+		Si no:
+			S2 <- S2 insertando X
+
+	Devolver S1, S2
+\end{lstlisting}
+
 
 \subsection{Propuesta semi-greedy}
 
+Para el algoritmo semi greedy cambiaremos de enfoque. En lugar de ir elemento a elemento decidiendo en que partición introducirlo, evaluaremos todas las posibilidades de todos los elementos, y escogeremos una de forma aleatoria, pero dando más oportunidades a aquellos elementos que minimicen la función objetivo. Una vez un elemento es escogido en un subconjunto, se eliminará de la lista de candidatos, para no tenerlo en cuenta en la siguiente iteración.
+
+\begin{lstlisting}
+SemiGreedy M2NP (S):
+	S1 <- conjunto vacio
+	S2 <- conjunto vacio
+
+	candidatos <- S
+
+	Mientras candidatos tenga elementos:
+		mejores_candidatos_s1 <- lista ordenada de elementos de candidatos que minimicen t si se introducen en S1
+		mejores_candidatos_s2 <- lista ordenada de elementos de candidatos que minimicen t si se introducen en S2
+
+		mejores_candidatos <- juntar mejores_candidatos_s1 y mejores_candidatos_s2 manteniendo el orden y añadiendo información sobre si viene de la lista de s1 o s2
+
+		elemento, lista_a_insertar <- escoger con una ruleta (mas probabilidad a los mejores) un elemento de mejores_candidatos
+
+		Si lista_a_insertar = S1:
+			S1 <- S1 insertando elemento
+		Si no:
+			S1 <- S2 insertando elemento
+
+		candidatos <- candidatos eliminando elemento
+
+	Devolver S1, S2
+\end{lstlisting}
+
 \subsection{Propuesta iterated greedy}
+
+El esquema de la solución iterated greedy es el mismo que vimos en clase y que en el problema anterior, lo que se ha modificado es las operaciones de destruir y construir soluciones.
+
+De cara a destruir la solución simplemente eliminaremos elementos de cada conjunto de forma aleatoria, mientras que para reconstruirla utilizaremos la misma técnica que con el algoritmo greedy, pero en lugar de partir de soluciones vacías partiremos de las soluciones parciales destruidas.
+
+\begin{lstlisting}
+DestruirSolucion(S1, S2, porcentajeDestruccion):
+	eliminados <- conjunto vacio
+
+	Para cada elemento x de S1:
+		Si aleatorio < porcentajeDestruccion:
+			S1 <- S1 eliminando x
+			eliminados <- eliminados insertando x
+
+	Para cada elemento x de S2:
+		Si aleatorio < porcentajeDestruccion:
+			S2 <- S2 eliminando x
+			eliminados <- eliminados insertando x
+
+	Devolver S1, S2, eliminados
+
+
+ConstruirSolucion(S1, S2, eliminados):
+	Para cada elemento X de eliminados:
+		S1_prima <- S1 insertando X
+		S2_prima <- S2 insertando X
+
+		Si t(S1_prima, S2) < t(S1, S2_prima):
+			S1 <- S1 insertando X
+		Si no:
+			S2 <- S2 insertando X
+
+	Devolver S1, S2
+
+Iterated-Greedy M2NP (S, iteraciones, porcentajeDestruccion):
+	S1, S2 <- Greedy M2NP(S)
+
+	Repetir iteraciones veces:
+		S1_destruida, S2_destruida, eliminados <- DestruirSolucion(S1, S2, porcentajeDestruccion)
+		S1_reconstruida, S2_reconstruida <- ConstruirSolucion(S1_destruida, S2_destruida, eliminados)
+
+		Si t(S1_reconstruida, S2_reconstruida) < t(S1, S2):
+			S1, S2 <- S1_reconstruida, S2_reconstruida
+
+	Devolver S1, S2
+\end{lstlisting}
+
 
 \subsection{Propuesta búsqueda local}
 
+Al igual que para el problema anterior, para proponer un algoritmo de búsqueda local tenemos que proponer primero un operador de vecino.
+
 \subsubsection{Operador de vecino}
+
+El operador de vecino escogerá un elemento aleatorio de entre ambos subconjuntos que conforman la solución, y lo cambiará de subconjunto, es decir si estaba en $S_1$ lo pasará a $S_2$ y viceversa.
+
+\begin{lstlisting}[language=python]
+Operador_vecino(S1, S2, movimientos_generados):
+
+	indice <- aleatorio entre 1 y |S1| + |S2|
+
+	Si indice < |S1|:
+		elemento <- S1[indice]
+		S1 <- S1 eliminando elemento
+		S2 <- S2 insertando elemento
+		movimientos_generados <- insertar el trio elemento, S1, S2
+	Si no:
+		elemento <- S2[indice - |S1|]
+		S2 <- S2 eliminando elemento
+		S1 <- S1 insertando elemento
+		movimientos_generados <- insertar el trio elemento, S2, S1
+
+	Devolver S1, S2
+\end{lstlisting}
 
 \subsubsection{Búsqueda local}
 
+Con dicho operador de vecino, la búsqueda local seguiría el mismo esquema comentado en el ejercicio anterior y en clase:
 
+\begin{lstlisting}[language=python]
+Busqueda local(S):
+	S1, S2 <- Greedy M2NP(S)
+	hay_mejora <- 1
+
+	Mientras hay_mejora = 1:
+		movimientos_generados <- conjunto vacio
+		hay_mejora <- 0
+
+		Mientras queden movimientos sin generar en movimientos_generados y hay_mejora = 0:
+			S1_vecino, S2_vecino, movimientos_generados <- Operador_vecino(S1, S2, movimientos_generados)
+			Si t(S1, S2) < t(S1, S2):
+				hay_mejora <- 1
+				S1, S2 <- S1_vecino, S2_vecino
+	Devolver S1, S2
+\end{lstlisting}
 
 \subsection{Propuesta algoritmo genético}
 
 \subsubsection{Representación de los cromosomas}
 
+En este problema, para las soluciones greedy, semi-greedy, iterated greedy y la búsqueda local hemos trabajado directamente con conjuntos, sin embargo, esa representación no es válida para un algoritmo genético. Por este motivo, para esta propuesta tenemos que modificar la representación.
+
+Para este apartado utilizaremos un vector con una longitud igual al número de elementos total de $S$, y en cada posición habrá un 1 o un 2, dependiendo del subconjunto asignado a cada elemento. Si nos damos cuenta, esta representación se trata de una representación binaria clásica, por lo que podemos utilizar todos los operadores de cruce y mutación pensados para representaciones binarias.
+
 \subsubsection{Operador de cruce}
+
+Con respecto al operador de cruce, al utilizar una representación binaria donde no hay problema en la cantidad de 1 o 2 en las soluciones, podemos simplemente utilizar el operador de cruce binario clásico. Escoger un punto de cruce e intercambiar ambas mitades de cada solución:
+
+\begin{lstlisting}[language=python]
+Operador cruce(padre, madre):
+
+	punto_cruce <- aleatorio entre 1 y |padre|
+
+	hijo1 <- padre[Desde 1 hasta punto_cruce] concatenado con madre[Desde punto_cruce hasta |madre|]
+	hijo2 <- madre[Desde 1 hasta punto_cruce] concatenado con padre[Desde punto_cruce hasta |padre|]
+
+	Devolver hijo1, hijo2
+\end{lstlisting}
+
 
 \subsubsection{Operador de mutación}
 
+Para el operador de mutación simplemente escogemos un gen al azar, y lo cambiamos de subconjunto:
+
+\begin{lstlisting}
+Operador_mutacion(cromosoma):
+	mutado <- cromosoma
+
+	punto_mutacion <- aleatorio entre 1 y |cromosoma|
+
+	Si mutado[punto_mutacion] = 1:
+		mutado[punto_mutacion] <- 2
+	Si no
+		mutado[punto_mutacion] <- 1
+
+	Devolver mutado
+\end{lstlisting}
+
+Y con esto ya tendríamos los operadores necesarios para usar un algoritmo genético en el problema.
+
 \subsubsection{Discusión sobre la inicialización de la población}
+
+La discusión sobre la inicialización de la población es exactamente la misma que en el problema anterior. Al igual que en el problema anterior tenemos las tres mismas formas de inicializar la solución, y dependiendo de como de rápido sea la convergencia del algoritmo podría ser interesante comenzar con una búsqueda local para enfocar la búsqueda e intentar una convergencia más rápida, o por el contrario usar una inicialización aleatoria para fomentar la exploración.
