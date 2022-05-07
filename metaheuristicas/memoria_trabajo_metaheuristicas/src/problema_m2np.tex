@@ -4,7 +4,16 @@
 
 Al igual que con el problema anterior, voy a comenzar por una breve revisión bibliográfica del problema para conocer las principales propuestas para resolverlo.
 
+Seguiré la misma metodología que con el problema anterior, lo buscaré en SCOPUS, ordenaré los resultados por mayor número de citas, y comentaré los más interesantes y que aporten al problema.
 
+Para empezar con una búsqueda rápida podemos ver que este problema es menos relevante que el anterior, los artículos publicados tienen muchas menos citas y SCOPUS nos devuelve tan solo diez resultados. De estos artículos, los más citados son propuestas basadas en evolución diferencial, algoritmos memético y modelos de programación lineal.
+
+El trabajo más citado, A binary algebraic differential evolution for the multidimensional two-way number partitioning problem \cite{evolucionDiferencialM2NP}, comenta los principales componentes del algoritmo de evolución diferencial, proponiendo un operador de cruce y mutación binarios para el problema. Además, de cara a mejorar la explotación añaden una búsqueda local que se aplicará a los individuos mutados. Con respecto a la experimentación, en este trabajo se han realizado una gran cantidad de experimentos, así como una comparación con distintos métodos del estado del arte del problema, como por ejemplo el uso de GRASP o de CPLEX. En esta comparativa se ve como claramente la propuesta de evolución diferencial consigue unos mejores resultados en comparación con el resto de propuestas, por lo que se puede concluir que un enfoque utilizando algoritmos evolutivos en este problema puede ser una buena propuesta.
+
+
+Otra de las propuestas más citadas es A memetic algorithm approach for solving the multidimensional multi-way number partitioning problem \cite{memeticoM2NP}, donde proponen un algoritmo genético en el que usan una búsqueda local para optimizar las soluciones de la población, y además añaden un mecanismo de control de las soluciones, donde eliminan las soluciones duplicadas de cara a evitar el estancamiento de la población y la convergencia prematura. En este trabajo comparan sus resultados con CPLEX, otra propuesta para resolver el problema, y en la mayoría de las soluciones consiguen unos mejores resultados. Sería interesante también lanzar esta propuesta y la comentada en el párrafo anterior de cara a realizar una comparativa entre ambos algoritmos evolutivos, evolución diferencial y este memético.
+
+Por último, otra propuesta bastante citada en el estado del arte es Integer linear programming model for multidimensional two-way number partitioning problem \cite{programacionLinealM2NP}, donde, en lugar de utilizar metaheurísticas para resolver el problema como la mayoría de artículos en el estado del arte, proponen un modelo de programación lineal. Este modelo es CPLEX, el comentado en ambas de las referencias vistas anteriormente. Aunque como era de esperar esta propuesta no se comporta tan bien como los algoritmos evolutivos vistos, es una solución bastante más simple que puede aportar al problema de cara a resolverlo de una forma rápida y sencilla.
 
 \subsection{Propuesta greedy}
 
